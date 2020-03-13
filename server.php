@@ -1,28 +1,33 @@
-<?php 
-$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-function onSocketFailure(string $message, $socket = null) {
-    if(is_resource($socket)) {
-        $message .= ": " . socket_strerror(socket_last_error($socket));
-    }
-    die($message);
-}
-if(!is_resource($socket)) {
-    onSocketFailure("Failed to create socket")
-}
-socket_connect($socket, "chat.stackoverflow.com", 6667)
-    || onSocketFailure("Failed to connect to chat.stackoverflow.com:6667", $socket);
-socket_write($socket, "NICK Alice\r\nUSER alice 0 * :Alice\r\n");
-while(true) {
-    // read a line from the socket
-    $line = socket_read($socket, 1024, PHP_NORMAL_READ);
-    if(substr($line, -1) === "\r") {
-        // read/skip one byte from the socket
-        // we assume that the next byte in the stream must be a \n.
-        // this is actually bad in practice; the script is vulnerable to unexpected values
-        socket_read($socket, 1, PHP_BINARY_READ);
-    }
+<?php
 
-    $message = parseLine($line);
-    if($message->type === "QUIT") break;
+$ftp_server = 'ftp.example.com';
+$ftp_user_name = 'notarealusername';
+$ftp_user_pass = 'notarealpassword';
+
+// set up basic connection
+$conn_id = ftp_connect($ftp_server);
+
+// login with username and password
+$login_result = ftp_login($conn_id, $ftp_user_name, $ftp_user_pass);
+
+// check connection
+if ((!$conn_id) || (!$login_result)) {
+    echo "FTP connection has failed!";
+    echo "Attempted to connect to $ftp_server for user $ftp_user_name";
+    exit;
+} else {
+    echo "Connected to $ftp_server, for user $ftp_user_name";
 }
-socket_close($socket);
+
+// upload the file
+$upload = ftp_put($conn_id, $destination_file, $source_file, FTP_BINARY);
+
+// check upload status
+if (!$upload) {
+    echo "FTP upload has failed!";
+} else {
+    echo "Uploaded $source_file to $ftp_server as $destination_file";
+}
+
+// close the FTP stream
+ftp_close($conn_id);
