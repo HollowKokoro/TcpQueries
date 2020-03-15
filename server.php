@@ -1,33 +1,28 @@
 <?php
 
-$ftp_server = 'ftp.example.com';
-$ftp_user_name = 'notarealusername';
-$ftp_user_pass = 'notarealpassword';
+// set some variables
+$host = "127.0.0.1";
+$port = 25003;
+// don't timeout!
+set_time_limit(0);
+// create socket
+$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+// bind socket to port
+$result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n");
+// start listening for connections
+$result = socket_listen($socket, 3) or die("Could not set up socket listener\n");
 
-// set up basic connection
-$conn_id = ftp_connect($ftp_server);
-
-// login with username and password
-$login_result = ftp_login($conn_id, $ftp_user_name, $ftp_user_pass);
-
-// check connection
-if ((!$conn_id) || (!$login_result)) {
-    echo "FTP connection has failed!";
-    echo "Attempted to connect to $ftp_server for user $ftp_user_name";
-    exit;
-} else {
-    echo "Connected to $ftp_server, for user $ftp_user_name";
-}
-
-// upload the file
-$upload = ftp_put($conn_id, $destination_file, $source_file, FTP_BINARY);
-
-// check upload status
-if (!$upload) {
-    echo "FTP upload has failed!";
-} else {
-    echo "Uploaded $source_file to $ftp_server as $destination_file";
-}
-
-// close the FTP stream
-ftp_close($conn_id);
+// accept incoming connections
+// spawn another socket to handle communication
+$spawn = socket_accept($socket) or die("Could not accept incoming connection\n");
+// read client input
+$input = socket_read($spawn, 1024) or die("Could not read input\n");
+// clean up input string
+$input = trim($input);
+echo "Client Message : ".$input;
+// reverse client input and send back
+$output = strrev($input) . "\n";
+socket_write($spawn, $output, strlen ($output)) or die("Could not write output\n");
+// close sockets
+socket_close($spawn);
+socket_close($socket);
