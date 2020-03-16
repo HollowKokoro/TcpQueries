@@ -1,7 +1,7 @@
 <?php
 
 $host    = "127.0.0.1";
-$port    = 25003;
+$port    = 35000;
 $message = "Hello Server";
 echo "Message To server :".$message;
 // create socket

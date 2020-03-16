@@ -2,7 +2,7 @@
 
 // set some variables
 $host = "127.0.0.1";
-$port = 25003;
+$port = 35000;
 // don't timeout!
 set_time_limit(0);
 // create socket
