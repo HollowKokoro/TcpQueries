@@ -1,5 +1,6 @@
 <?php
 
+$marker === true;
 $host = "127.0.0.1";
 $port = 25003;
 
@@ -11,7 +12,8 @@ $result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n"
 
 $result = socket_listen($socket, 3) or die("Could not set up socket listener\n");
 
-while () {
+
+while ($marker === true) {
     $spawn = socket_accept($socket) or die("Could not accept incoming connection\n");
     
     $input = socket_read($spawn, 1024) or die("Could not read input\n");
@@ -24,4 +26,5 @@ while () {
     
     socket_close($spawn);
     socket_close($socket);
+    $marker === false;
 }
