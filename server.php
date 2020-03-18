@@ -4,7 +4,7 @@ require_once "./config.php";
 
 set_time_limit(0);
 
-$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n");
 
 $result = socket_bind($socket, $address, $port) or die("Could not bind to socket\n");
 
