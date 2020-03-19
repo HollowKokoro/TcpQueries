@@ -19,8 +19,6 @@ while (true) {
     // Accept new connections
     if ($newSocket = socket_accept($socket)) {
         if (is_resource($newSocket)) {
-            // Write something back to the user
-            socket_write($newSocket, ">", 1).chr(0);
             // Don't block new connection
             socket_set_nonblock($newSocket);
             // Do something on the server side
