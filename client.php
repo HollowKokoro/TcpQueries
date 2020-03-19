@@ -11,4 +11,5 @@ $result = socket_connect($socket, $address, $port) or die("Could not connect to 
 
 while (true) {
     socket_write($socket, $message, strlen($message)) or die("Could not send data to server\n");
+    sleep(1);
 }
