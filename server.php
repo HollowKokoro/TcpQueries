@@ -22,7 +22,7 @@ while (true) {
         if (is_resource($newSocket)) {
             // Write something back to the user
             socket_write($newSocket, ">", 1).chr(0);
-            // Non bloco for the new connection
+            // Don't block new connection
             socket_set_nonblock($newSocket);
             // Do something on the server side
             echo "New client connected\n";
