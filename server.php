@@ -12,7 +12,6 @@ socket_listen($socket, 3) or die("Could not set up socket listener\n");
 
 socket_set_nonblock($socket);
 
-// Clients
 $clients = [];
 
 // Loop continuously
