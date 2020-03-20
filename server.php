@@ -14,17 +14,33 @@ socket_set_nonblock($socket);
 
 $clients = [];
 
-// Loop continuously
 while (true) {
-    // Accept new connections
     if ($newSocket = socket_accept($socket)) {
         if (is_resource($newSocket)) {
-            // Don't block new connection
             socket_set_nonblock($newSocket);
-            // Do something on the server side
             echo "New client connected\n";
-            // Append the new connection to the clients array
             $clients[] = $newSocket;
         }
     }
+    if (count($clients)) {
+        foreach ($clients AS $k => $v) {
+            $string = '';
+            if ($char = socket_read($v, 1024)) {
+                $string .= $char;
+            }
+            if ($string) {
+                echo "$k:$string\n";
+            } else {
+                if ($seconds > 60) {
+                    if (false === socket_write($v, 'PING')) {
+                        socket_close($clients[$k]);
+                        unset($clients[$k]);
+                    }
+                    $seconds = 0;
+                }
+            }
+        }
+    }
+    sleep(1);
 }
+socket_close($sock);
