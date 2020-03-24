@@ -23,7 +23,7 @@ while (true) {
         }
     }
     if (count($clients)) {
-        foreach ($clients AS $k => $v) {
+        foreach ($clients as $k => $v) {
             $string = '';
             if ($char = socket_read($v, 1024)) {
                 $string .= $char;
