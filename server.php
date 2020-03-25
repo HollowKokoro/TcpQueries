@@ -28,17 +28,8 @@ while (true) {
             if ($char = socket_read($v, 1024)) {
                 $string .= $char;
             }
-            if ($string) {
-                echo "$k:$string\n";
-            } else {
-                if ($seconds > 60) {
-                    if (false === socket_write($v, 'PING')) {
-                        socket_close($clients[$k]);
-                        unset($clients[$k]);
-                    }
-                    $seconds = 0;
-                }
-            }
+            echo "$k:$string\n";
+            
         }
     }
     sleep(1);
