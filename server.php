@@ -29,7 +29,6 @@ while (true) {
                 $string .= $char;
             }
             echo "$k:$string\n";
-            
         }
     }
     sleep(1);
