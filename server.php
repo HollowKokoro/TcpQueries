@@ -13,7 +13,6 @@ $clients = [];
 while (true) {
     $newSocket = socket_accept($socket) or die("Could not accept incoming connection\n");
     if (is_resource($newSocket)) {
-        //socket_set_nonblock($newSocket);
         echo "New client connected\n";
         $clients[] = $newSocket;
         while(($read = socket_read($newSocket, 1024, PHP_NORMAL_READ)) !== false) {
@@ -21,4 +20,3 @@ while (true) {
         }
     }
 }
-socket_close($socket);
