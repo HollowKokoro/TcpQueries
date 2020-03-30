@@ -41,14 +41,11 @@ while (true) {
 
                         unset($clients[$k]);
                     }
-
                     $seconds = 0;
                 }
             }
         }
     }
-
-    sleep(1);
 
     $seconds++;
 }
