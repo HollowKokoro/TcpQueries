@@ -33,7 +33,11 @@ while (true) {
             }
 
             if ($string) {
-                echo "$k:$string\n";
+                $string .= "\n";
+                $output = "$k:$string";
+                echo $output;
+                while ($clients[$k] !== $clients[substr($output, 0, 1)]);
+                socket_write();
             } else {
                 if ($seconds > 60) {
                     if (false === socket_write($v, 'PING')) {
@@ -46,7 +50,6 @@ while (true) {
             }
         }
     }
-
     $seconds++;
 }
 socket_close($sock);
