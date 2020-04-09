@@ -2,7 +2,7 @@
 
 require_once "./config.php";
 
-ini_set('error_reporting', E_ALL ^ E_NOTICE);
+ini_set('error_reporting', -1);
 ini_set('display_errors', 1);
 
 set_time_limit(0);
@@ -12,21 +12,17 @@ ob_implicit_flush();
 class Server
 {
     public $socket;
-    public array $clients;
+    public $clients;
 
-    public function __construct()
+    public function __construct($address, $port)
     {
-        $this->clients = array();
-    }
-    
-    public function connect($address, $port)
-    {
+        $this->clients = [];
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n" . socket_strerror(socket_last_error()) . "\n");
         socket_bind($this->socket, $address, $port) or die("Could not bind to socket\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
         socket_listen($this->socket, 3) or die("Could not set up socket listener\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
         socket_set_nonblock($this->socket);
     }
-
+    
     public function receive()
     {
         while (true) {
@@ -40,38 +36,18 @@ class Server
                 }
             }
         
-            if (count($this->clients)) {
-                foreach ($this->clients AS $k => $v) {
-                    $string = '';
-                    if ($char = socket_read($v, 1024)) {
-                        $string .= $char;
-                    }
-                    if ($string) {
-                        echo "$k:$string\n";
-                    } else {
-                        if ($seconds > 60) {
-                            if (false === socket_write($v, 'PING')) {
-                                socket_close($clients[$k]);
-                                unset($clients[$k]);
-                            }
-                            $seconds = 0;
-                        }
-                    }
+            foreach ($this->clients as $k => $v) {
+                $string = '';
+                if ($char = socket_read($v, 1024)) {
+                    $string .= $char;
                 }
-            }     
-            $seconds++;
+                if ($string) {
+                    echo "$k:$string\n";
+                } 
+            }
         }
     }    
-
-    /*public function send()
-    {
-        while($this->receive() != null) {
-            socket_write($this->socket, $this->receive(), strlen($this->receive())) or die("Could not send data to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-        }
-    }*/
 }
 
-$connect = new Server();
-$connect->connect($address, $port);
+$connect = new Server($address, $port);
 $connect->receive();
-//$connect->send();
