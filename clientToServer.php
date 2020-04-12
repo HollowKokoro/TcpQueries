@@ -4,15 +4,24 @@ require_once "./server.php";
 
 class ClientToServer extends Server
 {
+    public $userInput;
+    public $socketAccepted;
+
+    public function __construct()
+    {
+        $this->userInput = "";
+        $this->socketAccepted = null;
+    }
+
     public function receive()
     {
         while (true) {
-            if ($socketAccepted = socket_accept($this->socket)) {
-                if (is_resource($socketAccepted)) {
-                    socket_write($socketAccepted, ">", 1).chr(0);
-                    socket_set_nonblock($socketAccepted);
+            if ($this->socketAccepted = socket_accept($this->socket)) {
+                if (is_resource($this->socketAccepted)) {
+                    socket_write($this->socketAccepted, ">", 1).chr(0);
+                    socket_set_nonblock($this->socketAccepted);
                     echo "New client connected\n";
-                    $this->clients[] = $socketAccepted;
+                    $this->clients[] = $this->socketAccepted;
                 }
             }
         
@@ -22,9 +31,18 @@ class ClientToServer extends Server
                     $string .= $char;
                 }
                 if ($string) {
-                    echo "$k:$string\n";
+                    $string = "$k:$string\n";
+                    echo $string;
+                    $this->userInput = $string;
                 } 
             }
         }
-    }  
+    }
+    
+    public function send()
+    {
+        while (!empty($this->userInput)) {
+            socket_write($this->clients, $this->userInput, strlen($this->userInput)) or die("Could not send data to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
+        }
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 require_once "./config.php";
+require_once "./nonBlockingReadLine.php";
 
 class Client
 {
@@ -21,6 +22,16 @@ class Client
             sleep(1);
         }
     }
+    
+    public function readInput()
+    {
+        while(($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) !== false) {
+            echo "Read: $read\n";
+        }
+    }
 }
 $connect = new Client($address, $port);
 $connect->sendInput();
+$connect->readInput();
+$reader->nonBlockingReadLineFromStdIn();
+$reader->getPathsFromStdIn();

@@ -28,3 +28,4 @@ class Server
 $connectWithClient = new ClientToServer();
 $connectWithClient->openConnection($address, $port);
 $connectWithClient->receive();
+$connectWithClient->send();
