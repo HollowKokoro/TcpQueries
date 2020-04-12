@@ -6,7 +6,7 @@ class Client
 {
     public $socket;
 
-    public function connect($address, $port)
+    public function __construct($address, $port)
     {
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n" . socket_strerror(socket_last_error()) . "\n");
         socket_connect($this->socket, $address, $port) or die("Could not connect to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
@@ -18,13 +18,9 @@ class Client
             $input = readline();
             $input .= "\n";
             socket_write($this->socket, $input, strlen($input)) or die("Could not send data to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-            /*while(($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) !== false) {
-                echo "Read: $read\n";
-            }*/
             sleep(1);
         }
     }
 }
-$connect = new Client();
-$connect->connect($address, $port);
+$connect = new Client($address, $port);
 $connect->sendInput();
