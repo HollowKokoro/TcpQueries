@@ -1,11 +1,11 @@
 <?php
 
-require_once "./config.php";
+$config = require_once "./config.php";
 require_once "./nonBlockingReadLine.php";
 
 class Client
 {
-    public $socket;
+    private $socket;
 
     public function __construct($address, $port)
     {
@@ -13,25 +13,33 @@ class Client
         socket_connect($this->socket, $address, $port) or die("Could not connect to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
     }
 
-    public function sendInput()
+    public function handle()
     {
-        while (true) {
+        while(true) {
+            if (is_string(nonBlockingReadLineFromStdIn())) {
+                socket_write($this->socket, 1024, strlen($this->socket));
+            }
+            if (socket_select($read, $write = NULL, $except = NULL, 0) < 1) {
+                $this->readInput();
+            }
+        }
+        /*while (true) {
             $input = readline();
             $input .= "\n";
             socket_write($this->socket, $input, strlen($input)) or die("Could not send data to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-            sleep(1);
-        }
+        }*/
     }
     
     public function readInput()
     {
         while(($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) !== false) {
-            echo "Read: $read\n";
+            $str .= $read;
+            if (strpos($str, "\n") !== false) {
+                break;
+            }
         }
     }
 }
-$connect = new Client($address, $port);
-$connect->sendInput();
+$connect = new Client($config["address"], $config["port"]);
+$connect->handle();
 $connect->readInput();
-$reader->nonBlockingReadLineFromStdIn();
-$reader->getPathsFromStdIn();
