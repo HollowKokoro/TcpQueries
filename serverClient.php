@@ -1,15 +1,15 @@
 <?php
 
-require_once "./server.php";
 
+//прочитать и записать
 class ServerClient
 {
-    private $userInput;
     private $clients;
 
     public function __construct()
     {
         $this->userInput = "";
+        socket_set_nonblock($newClient);
         $this->clients[] = "clientId";
     }
  

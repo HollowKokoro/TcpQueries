@@ -1,7 +1,7 @@
 <?php
 
 $config = require_once "./config.php";
-require_once "./clientToServer.php";
+require_once "./serverClient.php";
 
 class Server
 {
@@ -20,15 +20,16 @@ class Server
     public function handle()
     {
         while (true) {
-            if ($this->socketAccepted = socket_accept($this->socket)) {
-                if (is_resource($this->socketAccepted)) {
-                    socket_write($this->socketAccepted, ">", 1).chr(0);
-                    socket_set_nonblock($this->socketAccepted);
-                    echo "New client connected\n";
-                    $this->clients[] = $this->socketAccepted;
+            if ($newClient = socket_accept($this->socket) && is_resource(socket_accept($this->socket))) {
+                $this->clients[] = new ServerClient();
+                if ($read = socket_read($newClient, 1024)) {
+                    echo $read;
+                    if (is_string($read)) {
+                        socket_write($newClient, $read, strlen($read));
+                    }
                 }
             }
-        }
+        }  
     }
 }
 

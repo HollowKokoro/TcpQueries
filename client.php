@@ -16,21 +16,36 @@ class Client
     public function handle()
     {
         while(true) {
-            if (is_string(nonBlockingReadLineFromStdIn())) {
-                socket_write($this->socket, 1024, strlen($this->socket));
-            }
-            if (socket_select($read, $write = NULL, $except = NULL, 0) < 1) {
-                $this->readInput();
-            }
-        }
-        /*while (true) {
             $input = readline();
-            $input .= "\n";
-            socket_write($this->socket, $input, strlen($input)) or die("Could not send data to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-        }*/
+            if ($this->nonBlockRead(STDIN, $input)) {
+                echo "Input: " . $input . "\n";
+            }
+            if (socket_select($input, $write = NULL, $except = NULL, 0) < 1) {
+                $this->readInput();
+            }     
+        }
+    }
+
+    private function nonBlockRead ($fd, &$data)
+    {
+        $read = array($fd);
+        $write = array();
+        $except = array();
+        $result = stream_select($read, $write, $except, 0);
+        
+        if ($result === false) { 
+            throw new RunTimeException("Can not select stream STDIN");
+        }
+
+        if ($result === 0) {
+            return false;
+        }
+        
+        $data = stream_get_line($fd, 1);
+        return $data;
     }
     
-    public function readInput()
+    private function readInput()
     {
         while(($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) !== false) {
             $str .= $read;
@@ -42,4 +57,3 @@ class Client
 }
 $connect = new Client($config["address"], $config["port"]);
 $connect->handle();
-$connect->readInput();
