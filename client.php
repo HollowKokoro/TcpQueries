@@ -27,7 +27,7 @@ class Client
         }
     }
 
-    private function nonBlockRead()
+    private function nonBlockRead(): string
     {
         $result = stream_select($read = [STDIN], $write = null, $except = null, 0);
         
@@ -38,7 +38,7 @@ class Client
         if ($result === 0) {
             return false;
         }
-        
+
         $stdinBuffer = "";
         while($stdinData = stream_get_line(STDIN, 1024, "\r\n")) {
             $stdinBuffer .= $stdinData;
