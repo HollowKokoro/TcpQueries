@@ -26,7 +26,7 @@ class Client
         }
     }
 
-    private function nonBlockRead ($fd, &$data)
+    private function nonBlockRead($fd, &$data)
     {
         $read = array($fd);
         $write = array();
