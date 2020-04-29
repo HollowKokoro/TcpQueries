@@ -20,7 +20,7 @@ class Client
             if ($this->nonBlockRead()) {
                 echo "Input: " . $input . "\n";
             }
-            if (socket_select([$this->socket], $write = NULL, $except = NULL, 0) > 0) {
+            if (socket_select([$this->socket], $write = null, $except = null, 0) > 0) {
                 $this->readFromServer();
             }
         usleep(500);
