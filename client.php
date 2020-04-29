@@ -16,8 +16,8 @@ class Client
     public function handle()
     {
         while(true) {
-            $input = readline();
             if ($this->nonBlockRead()) {
+                $input = readline();
                 echo "Input: " . $input . "\n";
             }
             if (socket_select([$this->socket], $write = null, $except = null, 0) > 0) {
