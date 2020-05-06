@@ -15,41 +15,51 @@ class Client
 
     public function handle()
     {
-        while(true) {
-            if ($this->nonBlockRead()) {
-                $input = readline();
-                echo "Input: " . $input . "\n";
+        while (true) {
+            $userText = $this->tryReadFromKeyboard();
+            if ($userText !== null) {
+                echo $userText;
             }
-            if (socket_select([$this->socket], $write = null, $except = null, 0) > 0) {
+
+            $read = [$this->socket];
+            $write = null;
+            $except = null;
+            if (socket_select($read, $write, $except, 0) > 0) {
                 $this->readFromServer();
             }
-        usleep(500);
+            usleep(500);
         }
     }
 
-    private function nonBlockRead(): string
+    private function tryReadFromKeyboard(): ?string
     {
-        $result = stream_select($read = [STDIN], $write = null, $except = null, 0);
+        $read = [STDIN];
+        $write = null;
+        $except = null;
+        $result = stream_select($read, $write, $except, 0);
         
         if ($result === false) { 
             throw new RunTimeException("Can not select stream STDIN");
         }
 
         if ($result === 0) {
-            return false;
+            return null;
         }
 
         $stdinBuffer = "";
-        while($stdinData = stream_get_line(STDIN, 1024, "\r\n")) {
+        while ($stdinData = stream_get_line(STDIN, 1024, "\n")) {
+            if ($stdinData == "") {
+                break;
+            }
             $stdinBuffer .= $stdinData;
         }
-        return $stdinData;
+        return trim($stdinBuffer);
     }
     
     private function readFromServer(): string
     {
         $buffer = "";
-        while(($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) !== false) {
+        while ($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) {
             if ($read == "") {
                 break;
             }
