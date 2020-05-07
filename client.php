@@ -13,25 +13,30 @@ class Client
         socket_connect($this->socket, $address, $port) or die("Could not connect to server\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
     }
 
-    public function handle()
+    public function handle(): void
     {
         while (true) {
-            $userText = $this->tryReadFromKeyboard();
+            $userText = $this->tryToReadFromKeyboard();
             if ($userText !== null) {
                 echo $userText;
             }
 
-            $read = [$this->socket];
-            $write = null;
-            $except = null;
-            if (socket_select($read, $write, $except, 0) > 0) {
-                $this->readFromServer();
-            }
-            usleep(500);
+            $this->tryToReadFromServer();
         }
     }
 
-    private function tryReadFromKeyboard(): ?string
+    private function tryToReadFromServer(): void
+    {
+        $read = [$this->socket];
+        $write = null;
+        $except = null;
+        if (socket_select($read, $write, $except, 0) > 0) {
+            $this->readFromServer();
+        }
+        usleep(50000);
+    }
+
+    private function tryToReadFromKeyboard(): ?string
     {
         $read = [STDIN];
         $write = null;
@@ -46,27 +51,28 @@ class Client
             return null;
         }
 
-        $stdinBuffer = "";
-        while ($stdinData = stream_get_line(STDIN, 1024, "\n")) {
+        $stdinMessage = "";
+        while ($stdinData = stream_get_line(STDIN, 1, "\n")) {
             if ($stdinData == "") {
                 break;
             }
-            $stdinBuffer .= $stdinData;
+            $stdinMessage .= $stdinData;
         }
-        return trim($stdinBuffer);
+        return trim($stdinMessage);
     }
     
     private function readFromServer(): string
     {
-        $buffer = "";
-        while ($read = socket_read($this->socket, 1024, PHP_NORMAL_READ)) {
-            if ($read == "") {
+        $readMessage = "";
+        while ($readPart = socket_read($this->socket, 1024, PHP_NORMAL_READ)) {
+            if ($readPart == "") {
                 break;
             }
-            $buffer .= $read;
+            $readMessage .= $readPart;
         }
-        return $buffer;
+        return $readMessage;
     }
 }
-$connect = new Client($config["address"], $config["port"]);
-$connect->handle();
+
+$client = new Client($config["address"], $config["port"]);
+$client->handle();
