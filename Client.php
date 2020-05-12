@@ -25,15 +25,22 @@ class Client
         }
     }
 
-    private function tryToReadFromServer(): void
+    private function tryToReadFromServer(): ?string
     {
         $read = [$this->socket];
         $write = null;
         $except = null;
         if (socket_select($read, $write, $except, 0) > 0) {
-            $this->readFromServer();
+            $readMessage = "";
+            while ($readPart = socket_read($this->socket, 1024, PHP_NORMAL_READ)) {
+                if ($readPart == "") {
+                    break;
+                }
+                $readMessage .= $readPart;
+                usleep(50000);
+            }
+            return $readMessage;
         }
-        usleep(50000);
     }
 
     private function tryToReadFromKeyboard(): ?string
@@ -57,20 +64,9 @@ class Client
                 break;
             }
             $stdinMessage .= $stdinData;
+            usleep(50000);
         }
         return trim($stdinMessage);
-    }
-    
-    private function readFromServer(): string
-    {
-        $readMessage = "";
-        while ($readPart = socket_read($this->socket, 1024, PHP_NORMAL_READ)) {
-            if ($readPart == "") {
-                break;
-            }
-            $readMessage .= $readPart;
-        }
-        return $readMessage;
     }
 }
 

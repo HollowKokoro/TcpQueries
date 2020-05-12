@@ -1,4 +1,5 @@
 <?php
+//declare(strict_types = 1);
 
 $config = require_once "./config.php";
 require_once "./serverClient.php";
@@ -8,7 +9,7 @@ class Server
     private $socket;
     private $clients;
 
-    public function __construct($address, $port)
+    public function __construct(string $address, int $port)
     {
         $this->clients = [];
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n" . socket_strerror(socket_last_error()) . "\n");
@@ -20,18 +21,17 @@ class Server
     public function handle()
     {
         while (true) {
-            if ($newClient = socket_accept($this->socket) && is_resource(socket_accept($this->socket))) {
-                $this->clients[] = new ServerClient();
-                if ($read = socket_read($newClient, 1024)) {
-                    echo $read;
-                    if (is_string($read)) {
-                        socket_write($newClient, $read, strlen($read));
-                    }
-                }
+            $getNewClient = socket_accept($this->socket);
+            if (!socket_accept($getNewClient)) {
+                null;
             }
-        }  
+            if (!is_resource($getNewClient)) {
+                null;
+            }
+            $this->clients[] = new ServerClient();
+        }
     }
 }
 
-$connectWithClient = new Server($config["address"], $config["port"]);
-$connectWithClient->handle();
+$connect = new Server($config["address"], $config["port"]);
+$connect->handle();
