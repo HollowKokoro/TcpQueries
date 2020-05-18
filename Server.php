@@ -2,7 +2,7 @@
 //declare(strict_types = 1);
 
 $config = require_once "./config.php";
-require_once "./serverClient.php";
+require_once "./ServerClient.php";
 
 class Server
 {
@@ -18,20 +18,25 @@ class Server
         socket_set_nonblock($this->socket);
     }
 
-    public function handle()
+    public function handle(): void
     {
         while (true) {
-            $getNewClient = socket_accept($this->socket);
-            if (!socket_accept($getNewClient)) {
+            $socket = $this->socketForClients();
+            if ($socket === false) {
                 null;
             }
-            if (!is_resource($getNewClient)) {
-                null;
-            }
-            $this->clients[] = new ServerClient();
+            socket_write($socket, 1024, strlen($socket));
+            usleep(50000);
         }
     }
+
+    private function socketForClients()
+    {
+        return socket_accept($this->socket); //передать в конструктор параметр
+
+    }
+    //вынести в отдельную функцию
 }
 
-$connect = new Server($config["address"], $config["port"]);
-$connect->handle();
+$server = new Server($config["address"], $config["port"]);
+$server->handle();

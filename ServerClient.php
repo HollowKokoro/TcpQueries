@@ -2,10 +2,11 @@
 
 class ServerClient
 {
-    public $connection;
+    private $connection;
 
     public function __construct()
     {
-        socket_set_nonblock();
-    } 
+        $this->connection;
+        socket_set_nonblock($this->connection);
+    }
 }
