@@ -18,7 +18,7 @@ class Client
         while (true) {
             $userText = $this->tryToReadFromKeyboard();
             if ($userText !== null) {
-                echo $userText;      
+                echo $userText;
             }
             $this->tryToReadFromServer();
             usleep(50000);
@@ -32,7 +32,7 @@ class Client
         $except = null;
         $result = socket_select($read, $write, $except, 0);
 
-        if ($result === false) { 
+        if ($result === false) {
             throw new RunTimeException("Can not connect with server");
         }
 
@@ -56,8 +56,8 @@ class Client
         $write = null;
         $except = null;
         $result = stream_select($read, $write, $except, 0);
-        
-        if ($result === false) { 
+
+        if ($result === false) {
             throw new RunTimeException("Can not select stream STDIN");
         }
 

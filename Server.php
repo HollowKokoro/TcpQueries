@@ -25,17 +25,16 @@ class Server
             if ($socket === false) {
                 null;
             }
-            socket_write($socket, 1024, strlen($socket));
+            $this->clients => new ServerClient();
             usleep(50000);
         }
     }
 
     private function socketForClients()
     {
-        return socket_accept($this->socket); //передать в конструктор параметр
+        return socket_accept($this->socket);
 
     }
-    //вынести в отдельную функцию
 }
 
 $server = new Server($config["address"], $config["port"]);
