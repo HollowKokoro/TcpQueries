@@ -7,7 +7,7 @@ require_once "./ServerClient.php";
 class Server
 {
     private $socket;
-    private $clients;
+    private $clientsData;
 
     public function __construct(string $address, int $port)
     {
@@ -21,11 +21,12 @@ class Server
     public function handle(): void
     {
         while (true) {
-            $socket = $this->socketForClients();
-            if ($socket === false) {
-                null;
+            $clientSocket = $this->socketForClients();
+            if ($socket !== false) {
+                $this->clientsData = new ServerClient();
+                socket_write($socket, $this->clients, strlen($this->clients));
             }
-            $this->clients => new ServerClient();
+
             usleep(50000);
         }
     }

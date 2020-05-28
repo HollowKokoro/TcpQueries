@@ -20,7 +20,10 @@ class Client
             if ($userText !== null) {
                 echo $userText;
             }
-            $this->tryToReadFromServer();
+            $serverText = $this->tryToReadFromServer();
+            if ($serverText !== null) {
+                echo $serverText;
+            }
             usleep(50000);
         }
     }
