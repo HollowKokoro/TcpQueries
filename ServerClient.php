@@ -4,9 +4,9 @@ class ServerClient
 {
     private $connection;
 
-    public function __construct()
+    public function __construct($socket)
     {
-        $this->connection;
+        $this->connection = $socket;
         socket_set_nonblock($this->connection);
     }
 }
