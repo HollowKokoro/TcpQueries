@@ -21,21 +21,35 @@ class Server
     public function handle(): void
     {
         while (true) {
-            $socket = $this->getNewClient();
-            if ($socket !== null) {
-                $this->clients => $socket;
+            $client = $this->getNewClient();
+            if ($client !== null) {
+                $this->clients[] = $client;
+            }
+            if ($this->tryToReadFromClient($client) !== null) {
             }
             usleep(50000);
         }
     }
 
-    private function getNewClient(): ?ServerClient()
+    private function getNewClient(): ?ServerClient
     {
-        $socket = socket_accept($this->socket);
-        if ($socket === false) {
+        $client = socket_accept($this->socket);
+        if ($client === false) {
             null;
         }
-        return ServerClient($socket);
+        return ServerClient($client);
+    }
+
+    private function tryToReadFromClient($client)
+    {
+        foreach ($this->clients as $client) {
+            $data = socket_read($client, 1024, PHP_NORMAL_READ);
+            if ($data === false) {
+                null;
+            }
+            sleep(1);
+        }
+        return $data;
     }
 }
 
