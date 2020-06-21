@@ -1,70 +1,42 @@
-<?php
-//declare(strict_types = 1);
+<?php 
+declare(strict_types = 1);
 
-$config = require_once "./config.php";
-require_once "./ServerClient.php";
-
-class Server
+abstract class Server
 {
+    /**
+     * @var $socket Открытый сокет
+     */
     private $socket;
-    private $clients;
 
-    public function __construct(string $address, int $port)
-    {
-        $this->clients = [];
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n" . socket_strerror(socket_last_error()) . "\n");
-        socket_bind($this->socket, $address, $port) or die("Could not bind to socket\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-        socket_listen($this->socket, 3) or die("Could not set up socket listener\n" . socket_strerror(socket_last_error($this->socket)) . "\n");
-        socket_set_nonblock($this->socket);
-    }
+    /**
+     * @var array $clients Каждый элемент массива содержит 
+     * отправленные данные соответствующего клиента
+     */
+    private array $clients;
 
-    public function handle(): void
-    {
-        while (true) {
-            $newClient = $this->getNewClient();
-            if ($newClient !== null) {
-                $this->clients[] = $newClient;
-            }
+    /**
+     * Конструктор, 
+     *
+     * @param string $address адрес пользователя
+     * @param integer $port порт пользователя
+     */
+    abstract public function __construct(string $address, int $port);
 
-            $data = $this->tryToReadFromClient($newClient);
-            if ($data !== null) {
-                
-                foreach ($this->clients as $newClient) {
-                    socket_write($newClient, $data, strlen($data));
-                }
-            }
-            
-            usleep(50000);
-        }
-    }
+    /**
+     * 
+     *
+     * @return void
+     */
+    abstract public function handle(): void;
 
-    private function getNewClient(): ?ServerClient
-    {
-        $client = socket_accept($this->socket);
-        if ($client === false) {
-            return null;
-        }
-        
-        return new ServerClient($client);
-    }
-
-    private function tryToReadFromClient($newClient): ?string
-    {
-        $readMessage = "";
-        while ($readPart = socket_read($newClient, 1024, PHP_NORMAL_READ)) {
-            if ($readMessage === false) {
-                $readMessage = null;
-                break;
-            }
-
-            if ($readPart == "") {
-                break;
-            }
-            $readMessage .= $readPart;
-        }
-        return $readMessage;
-    }
+    /**
+     * Извлекает первый запрос соединения из очереди ожидающих соединений
+     * для прослушивающего сокета, создает новый подключенный сокет и
+     * возвращает новый дескриптор файла, ссылающийся на этот сокет.
+     * В этот момент устанавливается соединение между клиентом и сервером,
+     * и они готовы к передаче данных.
+     *
+     * @return ServerClient|null
+     */
+    abstract protected function getNewClient(): ?ServerClient;
 }
-
-$server = new Server($config["address"], $config["port"]);
-$server->handle();
