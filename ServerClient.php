@@ -14,12 +14,11 @@ class ServerClient
     {
         $readMessage = "";
         while ($readPart = socket_read($this->connection, 1024, PHP_NORMAL_READ)) {
-            if ($readMessage === false) {
-                $readMessage = null;
-                break;
+            if ($readPart === false) {
+                return null;
             }
 
-            if ($readPart == "") {
+            if ($readPart === "") {
                 break;
             }
             $readMessage .= $readPart;
