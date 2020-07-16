@@ -9,20 +9,24 @@ class ServerClient
         $this->connection = $socket;
         socket_set_nonblock($this->connection);
     }
-
+/**
+ * Читает с клиентского сокета и возвращает переданные клиентом сегменты.
+ *
+ * @return string|null
+ */
     public function tryToReadFromClient(): ?string
     {
-        $readMessage = "";
-        while ($readPart = socket_read($this->connection, 1024, PHP_NORMAL_READ)) {
-            if ($readPart === false) {
+        $message = "";
+        while ($piece = socket_read($this->connection, 1024, PHP_NORMAL_READ)) {
+            if ($piece === false) {
                 return null;
             }
 
-            if ($readPart === "") {
+            if ($piece === "") {
                 break;
             }
-            $readMessage .= $readPart;
+            $message .= $piece;
         }
-        return $readMessage;
+        return $message;
     }
 }

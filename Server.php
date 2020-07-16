@@ -37,20 +37,22 @@ class Server
      */
     public function handle(): void
     {
+        $newClient = null;
         while (true) {
-            # code...
+            $newClient = $this->getNewClient();
+            if ($newClient !== null) {
+                echo $newClient;
+            }
         }
-        foreach ($this->clients as ) {
-            # code...
+
+        foreach ($this->clients as $client) {
+            socket_write($client, $newClient, strlen($newClient));
         }
     }
 
     /**
-     * Извлекает первый запрос соединения из очереди ожидающих соединений
-     * для прослушивающего сокета, создает новый подключенный сокет и
-     * возвращает новый дескриптор файла, ссылающийся на этот сокет.
-     * В этот момент устанавливается соединение между клиентом и сервером,
-     * и они готовы к передаче данных.
+     * Передаёт сокет в ServerClient и возвращает сегменты переданные
+     * клиентом на сервер либо null.
      *
      * @return ServerClient|null
      */
