@@ -41,12 +41,12 @@ class Server
         while (true) {
             $newClient = $this->getNewClient();
             if ($newClient !== null) {
-                echo $newClient;
+                $this->clients[] = $newClient;
             }
-        }
-
-        foreach ($this->clients as $client) {
-            socket_write($client, $newClient, strlen($newClient));
+            usleep(50000);
+            foreach ($this->clients as $client) {
+                (new ServerClient($newClient))->tryToReadFromClient();
+            }
         }
     }
 
